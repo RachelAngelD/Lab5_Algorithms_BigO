@@ -1,0 +1,81 @@
+
+import time
+
+# Student information
+LAST_NAME = "DAVID"
+STUDENT_ID = "TUPM-26-1110"
+FAVORITE_ARTIST = "OLIVIA"
+
+SEED_DIGIT = int(STUDENT_ID[-1])
+ID_SUM = sum(int(d) for d in STUDENT_ID if d.isdigit())
+NAME_LENGTH = len(LAST_NAME)
+ARTIST_LENGTH = len(FAVORITE_ARTIST)
+
+# 1. Generate two sorted datasets
+dataset_A = sorted([
+    ID_SUM + SEED_DIGIT + i * (SEED_DIGIT + 1)
+    for i in range(5)
+])
+
+dataset_B = sorted([
+    ARTIST_LENGTH + i * NAME_LENGTH
+    for i in range(5)
+])
+
+# 2. Merge the datasets and count comparisons
+def merge_sorted(A, B):
+    merged = []
+    i = 0
+    j = 0
+    comparisons = 0
+
+    while i < len(A) and j < len(B):
+        comparisons += 1
+
+        if A[i] <= B[j]:
+            merged.append(A[i])
+            i += 1
+        else:
+            merged.append(B[j])
+            j += 1
+
+    merged.extend(A[i:])
+    merged.extend(B[j:])
+
+    return merged, comparisons
+
+start = time.perf_counter()
+consolidated, comparisons = merge_sorted(dataset_A, dataset_B)
+execution_time = time.perf_counter() - start
+
+# 3. Verify ordering and record counts
+is_sorted = all(
+    consolidated[i] <= consolidated[i + 1]
+    for i in range(len(consolidated) - 1)
+)
+
+# 4. Display results
+print("===== UNIVERSITY ENROLLMENT RECORDS =====")
+print("Department A Dataset:", dataset_A)
+print("Department B Dataset:", dataset_B)
+print("Consolidated Dataset:", consolidated)
+
+print("\n===== RECORD COUNTS =====")
+print("Records in Department A:", len(dataset_A))
+print("Records in Department B:", len(dataset_B))
+print("Total Records Before Consolidation:",
+      len(dataset_A) + len(dataset_B))
+print("Records After Consolidation:", len(consolidated))
+
+print("\n===== MERGE ANALYSIS =====")
+print("Comparison Count:", comparisons)
+print("Ordering Verification:", "Passed" if is_sorted else "Failed")
+print("Execution Time:", execution_time, "seconds")
+
+print("\n===== COMPLEXITY =====")
+print("Time Complexity: O(n + m)")
+print("Space Complexity: O(n + m)")
+
+print("\n===== FINAL OUTPUT =====")
+print("Enrollment records successfully consolidated.")
+print("All records are in ascending order:", is_sorted)

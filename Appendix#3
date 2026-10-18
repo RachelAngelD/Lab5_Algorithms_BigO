@@ -1,0 +1,243 @@
+
+import random
+import time
+
+# ==========================================
+# 1. STUDENT-SPECIFIC INPUTS
+# ==========================================
+LAST_NAME = "DAVID"
+STUDENT_ID = "TUPM-26-1110"
+FAVORITE_ARTIST = "OLIVIA"
+
+SEED_DIGIT = int(STUDENT_ID[-1])
+ID_SUM = sum(int(d) for d in STUDENT_ID if d.isdigit())
+NAME_LENGTH = len(LAST_NAME)
+ARTIST_LENGTH = len(FAVORITE_ARTIST)
+ARTIST_SUM = sum(ord(c) - ord("A") + 1 for c in FAVORITE_ARTIST)
+
+random.seed(ID_SUM + ARTIST_SUM)
+
+# ==========================================
+# 2. GENERATE DATASET AND INPUT CONDITIONS
+# ==========================================
+orders = [
+    ID_SUM + i * (NAME_LENGTH + SEED_DIGIT + 1)
+    for i in range(10)
+]
+
+datasets = {
+    "Sorted": orders.copy(),
+    "Reverse-Ordered": orders[::-1],
+    "Random": random.sample(orders, len(orders))
+}
+
+print("=" * 55)
+print("LAB 5: SORTING ALGORITHMS AND BIG O")
+print("=" * 55)
+
+print("\n===== STUDENT INFORMATION =====")
+print("Last Name:", LAST_NAME)
+print("Student ID:", STUDENT_ID)
+print("Favorite Artist:", FAVORITE_ARTIST)
+print("Seed Digit:", SEED_DIGIT)
+print("ID Sum:", ID_SUM)
+print("Name Length:", NAME_LENGTH)
+print("Artist Length:", ARTIST_LENGTH)
+print("Artist Sum:", ARTIST_SUM)
+
+print("\n===== GENERATED ORDER DATASET =====")
+print("Generated Orders:", orders)
+
+print("\n===== SORTED, REVERSE, AND RANDOM INPUTS =====")
+for condition, data in datasets.items():
+    print(f"{condition} Input: {data}")
+
+# ==========================================
+# 3. BUBBLE SORT
+# ==========================================
+def bubble_sort(data):
+    arr = data.copy()
+    comparisons = 0
+    movements = 0
+    n = len(arr)
+
+    for i in range(n - 1):
+        swapped = False
+
+        for j in range(n - 1 - i):
+            comparisons += 1
+
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                movements += 1
+                swapped = True
+
+        if not swapped:
+            break
+
+    return arr, comparisons, movements
+
+# ==========================================
+# 4. SELECTION SORT
+# ==========================================
+def selection_sort(data):
+    arr = data.copy()
+    comparisons = 0
+    movements = 0
+    n = len(arr)
+
+    for i in range(n - 1):
+        min_index = i
+
+        for j in range(i + 1, n):
+            comparisons += 1
+
+            if arr[j] < arr[min_index]:
+                min_index = j
+
+        if min_index != i:
+            arr[i], arr[min_index] = arr[min_index], arr[i]
+            movements += 1
+
+    return arr, comparisons, movements
+
+# ==========================================
+# 5. INSERTION SORT
+# ==========================================
+def insertion_sort(data):
+    arr = data.copy()
+    comparisons = 0
+    movements = 0
+
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+
+        while j >= 0:
+            comparisons += 1
+
+            if arr[j] > key:
+                arr[j + 1] = arr[j]
+                movements += 1
+                j -= 1
+            else:
+                break
+
+        arr[j + 1] = key
+        movements += 1
+
+    return arr, comparisons, movements
+
+# ==========================================
+# 6. RUN ALL SORTING ALGORITHMS
+# ==========================================
+algorithms = {
+    "Bubble Sort": bubble_sort,
+    "Selection Sort": selection_sort,
+    "Insertion Sort": insertion_sort
+}
+
+results = []
+
+print("\n===== SORTING RESULTS =====")
+
+for condition, data in datasets.items():
+    print(f"\n--- {condition} Input ---")
+
+    for name, function in algorithms.items():
+        start = time.perf_counter()
+        sorted_data, comparisons, movements = function(data)
+        elapsed = time.perf_counter() - start
+
+        verified = sorted_data == sorted(data)
+
+        results.append({
+            "condition": condition,
+            "algorithm": name,
+            "comparisons": comparisons,
+            "movements": movements,
+            "time": elapsed,
+            "verified": verified
+        })
+
+        print(f"\nAlgorithm: {name}")
+        print("Original Input:", data)
+        print("Sorted Result:", sorted_data)
+        print("Comparisons:", comparisons)
+        print("Movements:", movements)
+        print(f"Execution Time: {elapsed:.8f} seconds")
+        print("Sorting Verification:",
+              "Passed" if verified else "Failed")
+
+# ==========================================
+# 7. PERFORMANCE SUMMARY
+# ==========================================
+print("\n===== PERFORMANCE SUMMARY =====")
+print(f"{'Input':<18}{'Algorithm':<18}"
+      f"{'Comparisons':<14}{'Movements':<12}{'Time (s)':<14}")
+
+for result in results:
+    print(
+        f"{result['condition']:<18}"
+        f"{result['algorithm']:<18}"
+        f"{result['comparisons']:<14}"
+        f"{result['movements']:<12}"
+        f"{result['time']:<14.8f}"
+    )
+
+# ==========================================
+# 8. BIG O ANALYSIS
+# ==========================================
+print("\n===== BIG O ANALYSIS =====")
+print("Bubble Sort:")
+print("  Best Case: O(n)")
+print("  Average Case: O(n^2)")
+print("  Worst Case: O(n^2)")
+
+print("\nSelection Sort:")
+print("  Best Case: O(n^2)")
+print("  Average Case: O(n^2)")
+print("  Worst Case: O(n^2)")
+
+print("\nInsertion Sort:")
+print("  Best Case: O(n)")
+print("  Average Case: O(n^2)")
+print("  Worst Case: O(n^2)")
+
+print("\nSpace Complexity:")
+print("  Auxiliary Space: O(1) for each algorithm")
+print("  Including copied input list: O(n)")
+
+# ==========================================
+# 9. BEST, AVERAGE, AND WORST CASE OBSERVATIONS
+# ==========================================
+print("\n===== CASE OBSERVATIONS =====")
+print("Best Case:")
+print("- Bubble Sort and Insertion Sort perform efficiently")
+print("  on already sorted input.")
+print("- Selection Sort still performs O(n^2) comparisons.")
+
+print("\nAverage Case:")
+print("- Random input generally requires more operations")
+print("  than already sorted input for adaptive algorithms.")
+print("- All three algorithms have O(n^2) average time.")
+
+print("\nWorst Case:")
+print("- Reverse-ordered input causes many shifts or swaps")
+print("  in Bubble Sort and Insertion Sort.")
+print("- All three algorithms have O(n^2) worst-case time.")
+
+# ==========================================
+# 10. FINAL VERIFICATION AND OUTPUT
+# ==========================================
+all_passed = all(result["verified"] for result in results)
+
+print("\n===== FINAL OUTPUT =====")
+print("Total Sorting Tests:", len(results))
+print("Algorithms Tested:", len(algorithms))
+print("Input Conditions:", len(datasets))
+print("All Sorting Results Correct:",
+      "Passed" if all_passed else "Failed")
+print("All Input Conditions Processed:",
+      len(results) == 9)
+print("Lab 5 Sorting Analysis Completed.")

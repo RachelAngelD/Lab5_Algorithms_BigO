@@ -1,0 +1,155 @@
+
+import time
+
+# ==========================================
+# STUDENT INFORMATION
+# ==========================================
+LAST_NAME = "DAVID"
+STUDENT_ID = "TUPM-26-1110"
+FAVORITE_ARTIST = "OLIVIA"
+
+SEED_DIGIT = int(STUDENT_ID[-1])
+ID_SUM = sum(int(digit) for digit in STUDENT_ID if digit.isdigit())
+NAME_LENGTH = len(LAST_NAME)
+ARTIST_LENGTH = len(FAVORITE_ARTIST)
+ARTIST_SUM = sum(ord(letter) - ord("A") + 1
+                 for letter in FAVORITE_ARTIST)
+
+# ==========================================
+# 1. GENERATE INCIDENT RECORDS
+# ==========================================
+# Generate unique, sorted incident record numbers.
+original_records = sorted(set(
+    ID_SUM + ARTIST_LENGTH + i * NAME_LENGTH
+    for i in range(15)
+))
+
+# Target incident is based on student-specific inputs.
+target = ID_SUM + ARTIST_SUM
+
+# ==========================================
+# 2. ROTATE THE RECORD LIST
+# ==========================================
+rotation_point = SEED_DIGIT % len(original_records)
+
+rotated_records = (
+    original_records[rotation_point:]
+    + original_records[:rotation_point]
+)
+
+# ==========================================
+# 3. BINARY SEARCH FOR ROTATED LIST
+# ==========================================
+def rotated_binary_search(records, target):
+    left = 0
+    right = len(records) - 1
+    comparisons = 0
+
+    while left <= right:
+        mid = (left + right) // 2
+        comparisons += 1
+
+        if records[mid] == target:
+            return mid, comparisons
+
+        # Determine which half is sorted.
+        if records[left] <= records[mid]:
+
+            if records[left] <= target < records[mid]:
+                right = mid - 1
+            else:
+                left = mid + 1
+
+        else:
+            if records[mid] < target <= records[right]:
+                left = mid + 1
+            else:
+                right = mid - 1
+
+    return -1, comparisons
+
+# ==========================================
+# 4. LINEAR SEARCH
+# ==========================================
+def linear_search(records, target):
+    comparisons = 0
+
+    for index, value in enumerate(records):
+        comparisons += 1
+
+        if value == target:
+            return index, comparisons
+
+    return -1, comparisons
+
+# ==========================================
+# 5. RUN AND MEASURE BOTH ALGORITHMS
+# ==========================================
+start = time.perf_counter()
+binary_position, binary_comparisons = rotated_binary_search(
+    rotated_records, target
+)
+binary_time = time.perf_counter() - start
+
+start = time.perf_counter()
+linear_position, linear_comparisons = linear_search(
+    rotated_records, target
+)
+linear_time = time.perf_counter() - start
+
+# ==========================================
+# 6. DISPLAY RESULTS
+# ==========================================
+print("===== STUDENT INFORMATION =====")
+print("Last Name:", LAST_NAME)
+print("Student ID:", STUDENT_ID)
+print("Favorite Artist:", FAVORITE_ARTIST)
+print("Seed Digit:", SEED_DIGIT)
+print("ID Sum:", ID_SUM)
+print("Name Length:", NAME_LENGTH)
+print("Artist Length:", ARTIST_LENGTH)
+print("Artist Sum:", ARTIST_SUM)
+
+print("\n===== INCIDENT RECORDS =====")
+print("Original Dataset:", original_records)
+print("Rotation Point:", rotation_point)
+print("Rotated Dataset:", rotated_records)
+print("Target Incident:", target)
+
+print("\n===== ROTATED BINARY SEARCH =====")
+if binary_position != -1:
+    print("Target Found at Index:", binary_position)
+    print("Position (1-based):", binary_position + 1)
+else:
+    print("Target Incident Not Found")
+
+print("Number of Comparisons:", binary_comparisons)
+print("Execution Time:", binary_time, "seconds")
+
+print("\n===== LINEAR SEARCH =====")
+if linear_position != -1:
+    print("Target Found at Index:", linear_position)
+    print("Position (1-based):", linear_position + 1)
+else:
+    print("Target Incident Not Found")
+
+print("Number of Comparisons:", linear_comparisons)
+print("Execution Time:", linear_time, "seconds")
+
+print("\n===== COMPLEXITY ANALYSIS =====")
+print("Rotated Binary Search:")
+print("Time Complexity: O(log n) average/best for this search")
+print("Worst-case Time Complexity: O(n)")
+print("Space Complexity: O(1)")
+
+print("\nLinear Search:")
+print("Time Complexity: O(n)")
+print("Space Complexity: O(1)")
+
+print("\n===== COMPARISON =====")
+if binary_comparisons < linear_comparisons:
+    print("Binary Search used fewer comparisons.")
+elif binary_comparisons > linear_comparisons:
+    print("Linear Search used fewer comparisons.")
+else:
+    print("Both algorithms used the same number of comparisons.")
